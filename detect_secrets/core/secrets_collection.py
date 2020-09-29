@@ -333,15 +333,16 @@ class SecretsCollection:
         :type f:        File object
         :type filename: string
         """
-        try:
-            log.info('Checking file: %s', filename)
+        log.info('Checking file: %s', filename)
 
-            for results, plugin in self._results_accumulator(filename):
+        for results, plugin in self._results_accumulator(filename):
+            try:
                 results.update(plugin.analyze(f, filename))
                 f.seek(0)
 
-        except UnicodeDecodeError:
-            log.warning('%s failed to load.', filename)
+            except UnicodeDecodeError:
+                log.warning('Plugin: %s UnicodeDecodeError on: %s.', plugin, filename)
+                f.seek(0)
 
     def _extract_secrets_from_patch(self, f, plugin, filename):
         """Extract secrets from a given patch file object.
